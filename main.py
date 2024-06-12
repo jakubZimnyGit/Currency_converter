@@ -9,6 +9,8 @@ Base_url = 'https://api.freecurrencyapi.com/v1/'
 printer = PrettyPrinter()
 API_KEY = os.getenv('API_KEY')
 
+Error_invalid_currency = '\nInvalid currency shortcut. Check currencies list for more information (option 1).\n'
+
 
 def get_currencies():
     url = f'{Base_url}currencies?apikey={API_KEY}'
@@ -37,28 +39,41 @@ def get_user_currency_input():
 
 
 def get_exchange_rate(base_currency, currency):
-    url = f'{Base_url}latest?apikey={API_KEY}&base_currency={base_currency}&currencies={currency}'
-    response = requests.get(url).json()
-    rate = response['data'][currency]
+    try:
+        url = f'{Base_url}latest?apikey={API_KEY}&base_currency={base_currency}&currencies={currency}'
+        response = requests.get(url).json()
+        rate = response['data'][currency]
+    except KeyError:
+        print(Error_invalid_currency)
+        return
+
     return rate
 
 
-def convert_currencies(base_currency, currency, amount):
+def convert_currencies(base_currency, currency, amount: float):
     rate = get_exchange_rate(base_currency=base_currency, currency=currency)
-    result: float = amount * rate
-    print(f'\n\n{amount} {base_currency} ==> {round(result, 2)} {currency}\n\n')
+    if rate:
+        result: float = amount * rate
+        print(f'\n\n{amount} {base_currency} ==> {round(result, 2)} {currency}\n\n')
 
 
 def currency_converter():
     base_currency, currency_to_convert_to = get_user_currency_input()
-    amount = float(input('enter the amount of money in base currency: '))
+    user_input = input('enter the amount of money in base currency: ')
+    try:
+        amount = float(user_input)
+    except ValueError:
+        print(f'\n--------Invalid value : {user_input} --------\n')
+        return
+
     return convert_currencies(base_currency, currency_to_convert_to, amount)
 
 
 def display_exchange_rate():
     base_currency, currency = get_user_currency_input()
     rate = get_exchange_rate(base_currency, currency)
-    print(f'\n\n{base_currency} ---> {currency} exchange rate: {rate}\n\n')
+    if rate:
+        print(f'\n\n{base_currency} ---> {currency} exchange rate: {rate}\n\n')
 
 
 def option_select():
@@ -83,6 +98,8 @@ def menu():
                 pass
             case "3":
                 display_exchange_rate()
+            case _:
+                print('\n-------Invalid input-------\n')
 
 
 def main():
