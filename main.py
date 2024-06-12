@@ -1,12 +1,10 @@
 import requests
 from dotenv import load_dotenv
 import os
-from pprint import PrettyPrinter
 
 load_dotenv()
 
 Base_url = 'https://api.freecurrencyapi.com/v1/'
-printer = PrettyPrinter()
 API_KEY = os.getenv('API_KEY')
 
 Error_invalid_currency = '\nInvalid currency shortcut. Check currencies list for more information (option 1).\n'
@@ -51,8 +49,8 @@ def get_exchange_rate(base_currency, currency):
 
 
 def convert_currencies(base_currency, currency, amount: float):
-    rate = get_exchange_rate(base_currency=base_currency, currency=currency)
-    if rate:
+    rate = get_exchange_rate(base_currency=base_currency, currency=currency)   # if the error occurred in this function,
+    if rate:                                                          # the value of rate == None, that's why: "if rate"
         result: float = amount * rate
         print(f'\n\n{amount} {base_currency} ==> {round(result, 2)} {currency}\n\n')
 
@@ -71,8 +69,8 @@ def currency_converter():
 
 def display_exchange_rate():
     base_currency, currency = get_user_currency_input()
-    rate = get_exchange_rate(base_currency, currency)
-    if rate:
+    rate = get_exchange_rate(base_currency, currency)  # if the error occurred in this function,
+    if rate:                                           # the value of rate == None, that's why: "if rate"
         print(f'\n\n{base_currency} ---> {currency} exchange rate: {rate}\n\n')
 
 
